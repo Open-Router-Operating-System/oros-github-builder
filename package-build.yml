@@ -1,0 +1,47 @@
+name: OROS package build
+run-name: OROS package build
+on:
+  workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
+      cmd:
+        required: true
+        type: string
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ inputs.name }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: vyos/vyos-build:${{ github.ref_name }}
+      options: --privileged --sysctl net.ipv6.conf.lo.disable_ipv6=0
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build prerequisites
+        run: |
+          git config --global --add safe.directory '*'
+          
+      - name: Build
+        run: |
+          ${{ inputs.cmd }}
+
+      - name: Commit files to repo
+        run: |
+          git clone https://${{ secrets.ACCESS_TOKEN }}@github.com/Open-Router-Operating-System/oros-repo.git
+          cp -f ../*.deb oros-repo/${{ github.ref_name }}
+          cd oros-repo
+          git add *
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          [ -n "$(git status --porcelain)" ] && git commit -m "Update package ${{ inputs.name }}"
+          git push origin
