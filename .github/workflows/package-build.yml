@@ -1,0 +1,66 @@
+name: OROS package build
+run-name: OROS package build
+on:
+  workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
+      cmd:
+        required: true
+        type: string
+    secrets:
+      ACCESS_TOKEN:
+        required: true
+
+concurrency:
+  group: ${{ inputs.name }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: vyos/vyos-build:${{ github.ref_name }}
+      options: --privileged --sysctl net.ipv6.conf.lo.disable_ipv6=0
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Build prerequisites
+        run: |
+          git config --global --add safe.directory '*'
+          apt-get install -y libaudit-dev libpam-dev autoconf-archive libpam0g-dev libcap-dev dh-virtualenv libcidr-dev check gnat gprbuild gawk golang-go libpci-dev libglib2.0-dev libboost-filesystem-dev libperl-dev
+
+          # FIXME: Currently we cannot use our repo
+          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libt/libtacplus-map/libtacplus-map1_1.0.1-cl5.1.0u9_amd64.deb
+          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libt/libtacplus-map/libtacplus-map-dev_1.0.1-cl5.1.0u9_amd64.deb
+          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libp/libpam-tacplus/libtac2_1.4.3-cl5.1.0u5_amd64.deb
+          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libp/libpam-tacplus/libpam-tacplus_1.4.3-cl5.1.0u5_amd64.deb
+          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libp/libpam-tacplus/libpam-tacplus-dev_1.4.3-cl5.1.0u5_amd64.deb
+          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libp/libpam-tacplus/libtac-dev_1.4.3-cl5.1.0u5_amd64.deb
+          dpkg -i libtacplus-map1_1.0.1-cl5.1.0u9_amd64.deb
+          dpkg -i libtacplus-map-dev_1.0.1-cl5.1.0u9_amd64.deb
+          dpkg -i libtac2_1.4.3-cl5.1.0u5_amd64.deb
+          dpkg -i libpam-tacplus_1.4.3-cl5.1.0u5_amd64.deb
+          dpkg -i libpam-tacplus-dev_1.4.3-cl5.1.0u5_amd64.deb
+          dpkg -i libtac-dev_1.4.3-cl5.1.0u5_amd64.deb
+          
+      - name: Build
+        run: |
+          ${{ inputs.cmd }}
+
+      - name: Commit files to repo
+        run: |
+          git clone https://${{ secrets.ACCESS_TOKEN }}@github.com/Open-Router-Operating-System/oros-repo.git
+          cp -f ../*.deb oros-repo/${{ github.ref_name }}
+          cd oros-repo
+          git add *
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          [ -n "$(git status --porcelain)" ] && git commit -m "Update package ${{ inputs.name }}"
+          git push origin
