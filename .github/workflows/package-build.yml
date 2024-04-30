@@ -37,18 +37,18 @@ jobs:
           apt-get install -y libaudit-dev libpam-dev autoconf-archive libpam0g-dev libcap-dev dh-virtualenv libcidr-dev check gnat gprbuild gawk golang-go libpci-dev libglib2.0-dev libboost-filesystem-dev libperl-dev
 
           # FIXME: Currently we cannot use our repo
-          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libt/libtacplus-map/libtacplus-map1_1.0.1-cl5.1.0u9_amd64.deb
-          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libt/libtacplus-map/libtacplus-map-dev_1.0.1-cl5.1.0u9_amd64.deb
-          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libp/libpam-tacplus/libtac2_1.4.3-cl5.1.0u5_amd64.deb
-          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libp/libpam-tacplus/libpam-tacplus_1.4.3-cl5.1.0u5_amd64.deb
-          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libp/libpam-tacplus/libpam-tacplus-dev_1.4.3-cl5.1.0u5_amd64.deb
-          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libp/libpam-tacplus/libtac-dev_1.4.3-cl5.1.0u5_amd64.deb
-          dpkg -i libtacplus-map1_1.0.1-cl5.1.0u9_amd64.deb
-          dpkg -i libtacplus-map-dev_1.0.1-cl5.1.0u9_amd64.deb
-          dpkg -i libtac2_1.4.3-cl5.1.0u5_amd64.deb
-          dpkg -i libpam-tacplus_1.4.3-cl5.1.0u5_amd64.deb
-          dpkg -i libpam-tacplus-dev_1.4.3-cl5.1.0u5_amd64.deb
-          dpkg -i libtac-dev_1.4.3-cl5.1.0u5_amd64.deb
+          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libt/libtacplus-map/libtacplus-map1_1.0.1-cl5.1.0u9_amd64.deb -P /tmp
+          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libt/libtacplus-map/libtacplus-map-dev_1.0.1-cl5.1.0u9_amd64.deb -P /tmp
+          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libp/libpam-tacplus/libtac2_1.4.3-cl5.1.0u5_amd64.deb -P /tmp
+          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libp/libpam-tacplus/libpam-tacplus_1.4.3-cl5.1.0u5_amd64.deb -P /tmp
+          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libp/libpam-tacplus/libpam-tacplus-dev_1.4.3-cl5.1.0u5_amd64.deb -P /tmp
+          wget https://download.nvidia.com/cumulus/apt.cumulusnetworks.com/repo/pool/cumulus/libp/libpam-tacplus/libtac-dev_1.4.3-cl5.1.0u5_amd64.deb -P /tmp
+          dpkg -i /tmp/libtacplus-map1_1.0.1-cl5.1.0u9_amd64.deb
+          dpkg -i /tmp/libtacplus-map-dev_1.0.1-cl5.1.0u9_amd64.deb
+          dpkg -i /tmp/libtac2_1.4.3-cl5.1.0u5_amd64.deb
+          dpkg -i /tmp/libpam-tacplus_1.4.3-cl5.1.0u5_amd64.deb
+          dpkg -i /tmp/libpam-tacplus-dev_1.4.3-cl5.1.0u5_amd64.deb
+          dpkg -i /tmp/libtac-dev_1.4.3-cl5.1.0u5_amd64.deb
           
       - name: Build
         run: |
