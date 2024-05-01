@@ -56,7 +56,7 @@ jobs:
 
       - name: Commit files to repo
         run: |
-          git clone https://${{ secrets.ACCESS_TOKEN }}@github.com/Open-Router-Operating-System/oros-repo.git
+          git clone https://${{ secrets.ACCESS_TOKEN }}@github.com/Open-Router-Operating-System/oros-repo.git --depth 1
           cp -f ../*.deb oros-repo/${{ github.ref_name }}
           cd oros-repo
           git add *
